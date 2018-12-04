@@ -17,10 +17,7 @@ void ofApp::setup()
     // Easily register for all search events.
     client.registerSearchEvents(this);
 
-    /* Ensure you have created and app and updated the credentials file
-     in the bin/data folder. You can create app at:
-     https://apps.twitter.com */
-    //Load in the credentials for access to twitter
+    //CREDENTIALS LOAD
     client.setCredentialsFromFile("credentials.json");
 
     /* Sets the polling interval for 6 seconds. This means new tweets
@@ -29,39 +26,14 @@ void ofApp::setup()
 
     // This starts a simple search for an emoticon.
     client.search(":)");
-    // Tweets are retured in the callbacks onStatus(..), onError(...), etc.
-
-    /*
-     To design more complex searches, see the the API documentation here:
-     https://dev.twitter.com/rest/public/search
-     and:
-     https://developer.twitter.com/en/docs/tweets/rules-and-filtering/overview/standard-operators
-     You can then use the search object ofxTwitter::SearchQuery like this:
-     
-        ofxTwitter::SearchQuery query(":)");
-        query.setLanguage("en");
-        client.search(query);
-
-     This would return only tweets in English
-    
-     To see how else you can refine the queries you should explore
-     the .h files included in:
-     openFrameworks/addons/ofxTwitter/libs/ofxTwitter/include/ofx/Twitter
-     In particular search.h
-    */
+    // Tweets are retured in the callbacks onStatus(..), onError(...), etc.]
 
 }
 
-/*
- Draw function is used to draw to GUI.
- Current setup simply draws tweet count info to a small GUI
- Tweets are displayed in console
-*/
 void ofApp::draw()
 {
     //sets background to black
     ofBackground(0);
-
     //counts number of tweets
     int total = count + countMissed;
 

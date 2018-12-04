@@ -16,6 +16,7 @@
 class ofApp: public ofBaseApp
 {
 public:
+
     //declare app functions
     void setup();
     void draw();
@@ -30,5 +31,7 @@ public:
     //declare variables
     int count = 0;
     int countMissed = 0;
+
+
 
 };

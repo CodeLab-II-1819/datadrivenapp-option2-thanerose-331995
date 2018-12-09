@@ -11,6 +11,8 @@
 
 #include "ofMain.h"
 #include "ofxTwitter.h"
+#include <vector>
+#include <string>
 
 
 class ofApp: public ofBaseApp
@@ -26,9 +28,14 @@ public:
     
 	//declare twitter search client
     ofxTwitter::SearchClient client;
-    
-    //declare variables
-    int count = 0;
+
+	stringstream tweetInfo;
+	stringstream ss;
+	vector<string> tweets;
+	string searchTerm;
+
+	//declare variables
+	int count = 0;
     int countMissed = 0;
 
 };

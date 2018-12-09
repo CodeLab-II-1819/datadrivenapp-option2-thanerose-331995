@@ -12,7 +12,7 @@
 int main()
 {
     //create small GUI window
-    ofSetupOpenGL(250, 75, OF_WINDOW);
+    ofSetupOpenGL(1280, 750, OF_WINDOW);
     //run the app from the ofApp class
     return ofRunApp(std::make_shared<ofApp>());
 }

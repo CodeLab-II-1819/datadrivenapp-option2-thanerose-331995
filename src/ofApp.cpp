@@ -7,56 +7,28 @@
 
 
 #include "ofApp.h"
+#include <string>
+using namespace std;
 
 //initial app setup
 void ofApp::setup()
 {
-    //lower app frameRate
+	//GENERAL SETUP
     ofSetFrameRate(30);
 
-    // Easily register for all search events.
+	//SEARCH SETUP
     client.registerSearchEvents(this);
-
-    /* Ensure you have created and app and updated the credentials file
-     in the bin/data folder. You can create app at:
-     https://apps.twitter.com */
-    //Load in the credentials for access to twitter
     client.setCredentialsFromFile("credentials.json");
 
-    /* Sets the polling interval for 6 seconds. This means new tweets
-    are retrived every 6 seconds*/
+	//POLLING TO GET NEW TWEETS
     client.setPollingInterval(6000);
 
-    // This starts a simple search for an emoticon.
-    client.search(":)");
-    // Tweets are retured in the callbacks onStatus(..), onError(...), etc.
-
-    /*
-     To design more complex searches, see the the API documentation here:
-     https://dev.twitter.com/rest/public/search
-     and:
-     https://developer.twitter.com/en/docs/tweets/rules-and-filtering/overview/standard-operators
-     You can then use the search object ofxTwitter::SearchQuery like this:
-     
-        ofxTwitter::SearchQuery query(":)");
-        query.setLanguage("en");
-        client.search(query);
-
-     This would return only tweets in English
-    
-     To see how else you can refine the queries you should explore
-     the .h files included in:
-     openFrameworks/addons/ofxTwitter/libs/ofxTwitter/include/ofx/Twitter
-     In particular search.h
-    */
-
+	//SEARCH TERMS
+	cout << "input search critera" << endl;
+	getline(cin,searchTerm);
+	client.search(searchTerm);
 }
 
-/*
- Draw function is used to draw to GUI.
- Current setup simply draws tweet count info to a small GUI
- Tweets are displayed in console
-*/
 void ofApp::draw()
 {
     //sets background to black
@@ -66,17 +38,16 @@ void ofApp::draw()
     int total = count + countMissed;
 
     //string stream used to display number of tweets recived
-    std::stringstream ss;
-    ss << "  Received: " << count << std::endl;
-    ss << "    Missed: " << countMissed << std::endl;
-    ss << "     Total: " << total << std::endl;
     
-    /*
-     Draw string stream info to the GUI window at x: 14 / y: 14
-     Bitmap string is default text with limited customisation optimisations
-     Load in fonts to enhance design
-    */
-    ofDrawBitmapString(ss.str(), 14, 14);
+    ss << "  Received: " << count << endl;
+    ss << "    Missed: " << countMissed << endl;
+    ss << "     Total: " << total << endl;
+    
+	
+    ofDrawBitmapString(ss.str(), 10, 14);
+	for (int x = 0; x < tweets.size(); x++) {
+		ofDrawBitmapString(tweets[x], 150, 14);
+	}
 }
 
 //This function is called everytime the a new tweet is recieved
@@ -86,16 +57,12 @@ void ofApp::onStatus(const ofxTwitter::Status& status)
     count++;
     
     //output the tweet author and text
-    std::cout << "User: " << status.user()->name() << endl;
-    std::cout << "Tweet: " << status.text() << endl;
-    std::cout << "\n -----------------------------\n" << endl;
+    tweetInfo << "User: " << status.user()->name() << endl;
+	tweetInfo << "Tweet: " << status.text() << endl;
+	tweetInfo << "\n -----------------------------\n" << endl;
+	tweets.push_back(tweetInfo.str());
     
-    /*
-     To see what other information you can display you should explore
-     the .h files included in:
-     openFrameworks/addons/ofxTwitter/libs/ofxTwitter/include/ofx/Twitter
-     In particular status.h
-    */
+
 }
 
 //returns an error message if error encountered recieving tweets

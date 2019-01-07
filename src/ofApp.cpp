@@ -20,14 +20,25 @@ void ofApp::setup()
 
 	//SEARCH SETUP
     client.registerSearchEvents(this);
+//<<<<<<< HEAD
+//=======
+
+    //CREDENTIALS LOAD
+//>>>>>>> ae26fc8aff222f183d470ca01a4599a3b08d31c1
     client.setCredentialsFromFile("credentials.json");
 
 	//POLLING TO GET NEW TWEETS
     client.setPollingInterval(6000);
 
+//<<<<<<< HEAD
 	//TEXT
 	myfont.init("JustAnotherHand-Regular.ttf", 20);
 	myfont.wrapTextX(500);
+//=======
+    // This starts a simple search for an emoticon.
+    client.search(":)");
+    // Tweets are retured in the callbacks onStatus(..), onError(...), etc.]
+//>>>>>>> ae26fc8aff222f183d470ca01a4599a3b08d31c1
 
 	//SEARCH TERMS
 	cout << "input search critera" << endl;
@@ -37,11 +48,16 @@ void ofApp::setup()
 
 void ofApp::draw()
 {
+//<<<<<<< HEAD
 	//ofEnableAlphaBlending();
 
 	background.load("wood-background.jpg");
 	background.draw(0, 0);
 
+//=======
+    //sets background to black
+    ofBackground(0);
+//>>>>>>> ae26fc8aff222f183d470ca01a4599a3b08d31c1
     //counts number of tweets
     int total = count + countMissed;
 

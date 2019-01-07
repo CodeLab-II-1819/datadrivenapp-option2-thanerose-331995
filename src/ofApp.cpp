@@ -7,6 +7,8 @@
 
 
 #include "ofApp.h"
+#include "ofxGui.h"
+#include "ofxTextSuite.h"
 #include <string>
 using namespace std;
 
@@ -23,6 +25,10 @@ void ofApp::setup()
 	//POLLING TO GET NEW TWEETS
     client.setPollingInterval(6000);
 
+	//TEXT
+	myfont.init("JustAnotherHand-Regular.ttf", 20);
+	myfont.wrapTextX(500);
+
 	//SEARCH TERMS
 	cout << "input search critera" << endl;
 	getline(cin,searchTerm);
@@ -31,23 +37,32 @@ void ofApp::setup()
 
 void ofApp::draw()
 {
-    //sets background to black
-    ofBackground(0);
+	//ofEnableAlphaBlending();
+
+	background.load("wood-background.jpg");
+	background.draw(0, 0);
 
     //counts number of tweets
     int total = count + countMissed;
 
     //string stream used to display number of tweets recived
     
-    ss << "  Received: " << count << endl;
-    ss << "    Missed: " << countMissed << endl;
-    ss << "     Total: " << total << endl;
-    
-	
-    ofDrawBitmapString(ss.str(), 10, 14);
+    //ss << "  Received: " << count << endl;
+    //ss << "    Missed: " << countMissed << endl;
+    //ss << "     Total: " << total << endl;
+    //ofDrawBitmapString(ss.str(), 10, 14);
+
+
 	for (int x = 0; x < tweets.size(); x++) {
-		ofDrawBitmapString(tweets[x], 150, 14);
+
+		//card.load("card.png");
+		//card.resize(500,200);
+		//card.draw(basex, basey + (x*50));
+
+		myfont.setText(tweets[x]);
+		myfont.draw(basex, basey + (x * 50));
 	}
+	//ss.str("");
 }
 
 //This function is called everytime the a new tweet is recieved
@@ -59,10 +74,9 @@ void ofApp::onStatus(const ofxTwitter::Status& status)
     //output the tweet author and text
     tweetInfo << "User: " << status.user()->name() << endl;
 	tweetInfo << "Tweet: " << status.text() << endl;
-	tweetInfo << "\n -----------------------------\n" << endl;
 	tweets.push_back(tweetInfo.str());
-    
-
+	tweetInfo.str("");
+	
 }
 
 //returns an error message if error encountered recieving tweets

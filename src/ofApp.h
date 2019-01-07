@@ -11,6 +11,8 @@
 
 #include "ofMain.h"
 #include "ofxTwitter.h"
+#include "ofxGui.h"
+#include "ofxTextSuite.h"
 #include <vector>
 #include <string>
 
@@ -31,8 +33,20 @@ public:
 
 	stringstream tweetInfo;
 	stringstream ss;
-	vector<string> tweets;
 	string searchTerm;
+
+	//gui properties
+	ofImage background;
+	ofImage card;
+	ofxPanel panel;
+
+	ofxTextBlock myfont;
+	TextBlockAlignment alignment;
+
+	vector<string> tweets;
+
+	int basex = 100;
+	int basey = 0;
 
 	//declare variables
 	int count = 0;

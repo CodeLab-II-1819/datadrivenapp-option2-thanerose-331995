@@ -32,6 +32,7 @@ void ofApp::setup()
 	//GUI
 	btn.set(ofGetWindowWidth() - basex, basey, 150, 100);
 	idCheck.set(ofGetWindowWidth() / 2, (ofGetWindowHeight() / 2) + 100, 500, 100);
+	searchbar.set(basex, basey, 350, 100);
 
 	// This starts a simple search for an emoticon.
 	client.search(":)");
@@ -42,12 +43,12 @@ void ofApp::setup()
 	//getline(cin,searchTerm);
 	//client.search(searchTerm);
 
-	state = LOGIN;
-	cout << "test" << endl;
+	state = HOME;
 }
 
 void ofApp::draw()
 {
+	cout << "draw" << endl;
 	if (state == LOGIN) {
 		ofBackground(193, 106, 7);
 
@@ -71,10 +72,16 @@ void ofApp::draw()
 		ofSetColor(255, 255);
 		background.draw(0, 0, ofGetScreenWidth(), ofGetScreenHeight());
 
-
 		//SIDEBAR
+		//
 		ofSetColor(255, 255, 255);
 		ofDrawRectangle(btn);
+
+		//searchbar
+		ofDrawRectangle(searchbar);
+		ofSetColor(1, 1, 1);
+		myfont.setHtmlText(searchstring.str());
+		myfont.draw(basex + 20, basey);
 
 		//TWEETS
 		for (int i = 0; i < tweets.size(); i++) {
@@ -82,13 +89,13 @@ void ofApp::draw()
 			ofImage card;
 			card.load("card.png");
 			ofSetColor(255, 255);
-			card.draw(basex, basey + (i * 300), 1000, 220);
+			card.draw(basex + 450, basey + (i * 350), 1000, 250);
 
 			//TWEET TXT
 			myfont.setColor(1, 1, 1, 255);
 			myfont.setHtmlText("User: " + tweets[i].userName + "\n" + tweets[i].tweetText);
 			myfont.wrapTextX(1000, false);
-			myfont.draw(basex + 10, basey + (10 + (i * 300)));
+			myfont.draw(basex + 460, basey + (10 + (i * 350)));
 		}
 		ofDrawBitmapString(xmouse, xmouse + 15, ymouse - 30);
 		ofDrawBitmapString(ymouse, xmouse + 15, ymouse - 20);
@@ -143,10 +150,24 @@ Tweet::Tweet(string userName, string tweetText, ofxTwitter::Entities entities, s
 void ofApp::keyPressed(int key) {
 	if (state == LOGIN) {
 		if (GetKeyState(VK_RETURN)) {
-			//client.USER_AGENT();
+			
 		}
-		cout << char(key) << endl;
-		login << char(key);
+		else {
+			cout << char(key) << endl;
+			login << char(key);
+		}
+	}
+	else if (state == HOME) {
+		if (key == ' ') {
+			cout << "debug" << endl;
+			cout << searchstring.str() << endl;
+			tweets.clear();
+			client.search(searchstring.str());
+			searchstring.clear();
+		}
+		else {
+			searchstring << char(key);
+		}
 	}
 }
 /*

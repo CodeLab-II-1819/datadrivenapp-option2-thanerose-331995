@@ -49,7 +49,7 @@ public:
 
 	//gui properties
 	ofxPanel sidebar;
-	ofRectangle btn, idCheck;
+	ofRectangle btn, idCheck, searchbar;
 
 	ofxTextBlock myfont;
 	TextBlockAlignment alignment;
@@ -60,8 +60,9 @@ public:
 	enum states { LOGIN, HOME };
 	states state;
 	stringstream login;
+	stringstream searchstring;
 
-	int basex = 250;
+	int basex = 100;
 	int basey = 100;
 
 	//declare variables

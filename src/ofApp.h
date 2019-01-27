@@ -16,43 +16,56 @@
 #include <vector>
 #include <string>
 
+class Tweet {
+public:
+	string userName;
+	string tweetText;
+	ofxTwitter::Entities entities;
+	string screenName;
 
-class ofApp: public ofBaseApp
+	Tweet(string userName, string tweetText, ofxTwitter::Entities entities, string screenName);
+};
+
+class ofApp : public ofBaseApp
 {
 public:
 
-    //declare app functions
-    void setup();
-    void draw();
-    void onStatus(const ofxTwitter::Status& status);
-    void onError(const ofxTwitter::Error& error);
-    void onException(const std::exception& exception);
+	//declare app functions
+	void setup();
+	void draw();
+	void onStatus(const ofxTwitter::Status& status);
+	void onError(const ofxTwitter::Error& error);
+	void onException(const std::exception& exception);
 	void onMessage(const ofJson& json);
-    
-	//declare twitter search client
-    ofxTwitter::SearchClient client;
+	void mouseMoved(int x, int y);
+	void mousePressed(int x, int y, int button);
+	void keyPressed(int key);
 
-	stringstream tweetInfo;
-	stringstream ss;
+	//declare twitter search client
+	ofxTwitter::SearchClient client;
+	ofxTwitter::User user;
+	ofxTwitter::BaseUser baseuser;
 	string searchTerm;
 
 	//gui properties
-	ofImage background;
-	ofImage card;
-	ofxPanel panel;
+	ofxPanel sidebar;
+	ofRectangle btn, idCheck;
 
 	ofxTextBlock myfont;
 	TextBlockAlignment alignment;
 
-	vector<string> tweets;
+	//vector
+	vector<Tweet> tweets;
 
-	int basex = 100;
-	int basey = 0;
+	enum states { LOGIN, HOME };
+	states state;
+	stringstream login;
+
+	int basex = 250;
+	int basey = 100;
 
 	//declare variables
+	int xmouse, ymouse;
 	int count = 0;
-    int countMissed = 0;
-
-
-
+	int countMissed = 0;
 };

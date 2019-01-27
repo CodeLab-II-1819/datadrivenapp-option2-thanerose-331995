@@ -5,7 +5,6 @@
  SPDX-License-Identifier:	MIT
 */
 
-
 #include "ofApp.h"
 #include "ofxGui.h"
 #include "ofxTextSuite.h"
@@ -16,98 +15,147 @@ using namespace std;
 void ofApp::setup()
 {
 	//GENERAL SETUP
-    ofSetFrameRate(30);
+	ofSetFrameRate(30);
 
 	//SEARCH SETUP
-    client.registerSearchEvents(this);
-//<<<<<<< HEAD
-//=======
+	client.registerSearchEvents(this);
 
-    //CREDENTIALS LOAD
-//>>>>>>> ae26fc8aff222f183d470ca01a4599a3b08d31c1
-    client.setCredentialsFromFile("credentials.json");
+	//CREDENTIALS LOAD
+	client.setCredentialsFromFile("credentials.json");
 
 	//POLLING TO GET NEW TWEETS
-    client.setPollingInterval(6000);
+	client.setPollingInterval(6000);
 
-//<<<<<<< HEAD
 	//TEXT
-	myfont.init("JustAnotherHand-Regular.ttf", 20);
-	myfont.wrapTextX(500);
-//=======
-    // This starts a simple search for an emoticon.
-    client.search(":)");
-    // Tweets are retured in the callbacks onStatus(..), onError(...), etc.]
-//>>>>>>> ae26fc8aff222f183d470ca01a4599a3b08d31c1
+	myfont.init("JustAnotherHand-Regular.ttf", 50);
+
+	//GUI
+	btn.set(ofGetWindowWidth() - basex, basey, 150, 100);
+	idCheck.set(ofGetWindowWidth() / 2, (ofGetWindowHeight() / 2) + 100, 500, 100);
+
+	// This starts a simple search for an emoticon.
+	client.search(":)");
+	// Tweets are retured in the callbacks onStatus(..), onError(...), etc.]
 
 	//SEARCH TERMS
-	cout << "input search critera" << endl;
-	getline(cin,searchTerm);
-	client.search(searchTerm);
+	//cout << "input search critera" << endl;
+	//getline(cin,searchTerm);
+	//client.search(searchTerm);
+
+	state = LOGIN;
+	cout << "test" << endl;
 }
 
 void ofApp::draw()
 {
-//<<<<<<< HEAD
-	//ofEnableAlphaBlending();
+	if (state == LOGIN) {
+		ofBackground(193, 106, 7);
 
-	background.load("wood-background.jpg");
-	background.draw(0, 0);
+		myfont.setColor(1, 1, 1, 255);
+		myfont.setHtmlText("Enter User ID");
+		myfont.draw(ofGetWindowWidth() / 2, ofGetWindowHeight() / 2);
 
-//=======
-    //sets background to black
-    ofBackground(0);
-//>>>>>>> ae26fc8aff222f183d470ca01a4599a3b08d31c1
-    //counts number of tweets
-    int total = count + countMissed;
+		ofSetColor(255, 255, 255);
+		ofDrawRectangle(idCheck);
 
-    //string stream used to display number of tweets recived
-    
-    //ss << "  Received: " << count << endl;
-    //ss << "    Missed: " << countMissed << endl;
-    //ss << "     Total: " << total << endl;
-    //ofDrawBitmapString(ss.str(), 10, 14);
+		ofSetColor(1, 1, 1);
+		myfont.setHtmlText(login.str());
+		myfont.draw((ofGetWindowWidth() / 2) + 20, (ofGetWindowHeight() / 2) + 100);
 
-
-	for (int x = 0; x < tweets.size(); x++) {
-
-		//card.load("card.png");
-		//card.resize(500,200);
-		//card.draw(basex, basey + (x*50));
-
-		myfont.setText(tweets[x]);
-		myfont.draw(basex, basey + (x * 50));
 	}
-	//ss.str("");
+	else if (state == HOME) {
+
+		//BACKGROUND
+		ofImage background;
+		background.load("wood-background.jpg");
+		ofSetColor(255, 255);
+		background.draw(0, 0, ofGetScreenWidth(), ofGetScreenHeight());
+
+
+		//SIDEBAR
+		ofSetColor(255, 255, 255);
+		ofDrawRectangle(btn);
+
+		//TWEETS
+		for (int i = 0; i < tweets.size(); i++) {
+			//TWEET BG
+			ofImage card;
+			card.load("card.png");
+			ofSetColor(255, 255);
+			card.draw(basex, basey + (i * 300), 1000, 220);
+
+			//TWEET TXT
+			myfont.setColor(1, 1, 1, 255);
+			myfont.setHtmlText("User: " + tweets[i].userName + "\n" + tweets[i].tweetText);
+			myfont.wrapTextX(1000, false);
+			myfont.draw(basex + 10, basey + (10 + (i * 300)));
+		}
+		ofDrawBitmapString(xmouse, xmouse + 15, ymouse - 30);
+		ofDrawBitmapString(ymouse, xmouse + 15, ymouse - 20);
+	}
 }
 
 //This function is called everytime the a new tweet is recieved
 void ofApp::onStatus(const ofxTwitter::Status& status)
 {
-    //increase tweet count
-    count++;
-    
-    //output the tweet author and text
-    tweetInfo << "User: " << status.user()->name() << endl;
-	tweetInfo << "Tweet: " << status.text() << endl;
-	tweets.push_back(tweetInfo.str());
-	tweetInfo.str("");
-	
+	Tweet newTweet(status.user()->name(), status.text(), status.entities(), status.user()->screenName());
+
+	tweets.push_back(newTweet);
 }
 
 //returns an error message if error encountered recieving tweets
 void ofApp::onError(const ofxTwitter::Error& error)
 {
-    std::cout << "Error: " << error.code() << " " << error.message();
+	std::cout << "Error: " << error.code() << " " << error.message();
 }
 
 //returns an exception message if exception encountered recieving tweets
 void ofApp::onException(const std::exception& notice)
 {
-    std::cout << "Exception: " << notice.what();
+	std::cout << "Exception: " << notice.what();
 }
 
 void ofApp::onMessage(const ofJson& json)
 {
 	// This is the raw message json and is ignored here.
 }
+
+void ofApp::mouseMoved(int x, int y) {
+	xmouse = x;
+	ymouse = y;
+}
+
+void ofApp::mousePressed(int x, int y, int button) {
+	if (btn.inside(x, y)) {
+		std::cout << "Clicked button 2" << endl;
+		tweets.clear();
+		client.search(searchTerm);
+	}
+}
+
+Tweet::Tweet(string userName, string tweetText, ofxTwitter::Entities entities, string screenName) {
+	this->userName = userName;
+	this->tweetText = tweetText;
+	this->entities = entities;
+	this->screenName = screenName;
+}
+
+void ofApp::keyPressed(int key) {
+	if (state == LOGIN) {
+		if (GetKeyState(VK_RETURN)) {
+			//client.USER_AGENT();
+		}
+		cout << char(key) << endl;
+		login << char(key);
+	}
+}
+/*
+void checkKey(int key) {
+
+	char l;
+
+	switch (key) {
+		case
+	}
+}
+*/

@@ -13,6 +13,7 @@
 #include "ofxTwitter.h"
 #include "ofxGui.h"
 #include "ofxTextSuite.h"
+#include "ofxJSON.h"
 #include <vector>
 #include <string>
 
@@ -20,10 +21,10 @@ class Tweet {
 public:
 	string userName;
 	string tweetText;
-	ofxTwitter::Entities entities;
 	string screenName;
+	string mediaID;
 
-	Tweet(string userName, string tweetText, ofxTwitter::Entities entities, string screenName);
+	Tweet(string userName, string tweetText, string screenName, string mediaID);
 };
 
 class ofApp : public ofBaseApp
@@ -33,19 +34,26 @@ public:
 	//declare app functions
 	void setup();
 	void draw();
-	void onStatus(const ofxTwitter::Status& status, ofxTwitter::Entities& ent);
+	void onStatus(const ofxTwitter::Status& status);
 	void onError(const ofxTwitter::Error& error);
 	void onException(const std::exception& exception);
 	void onMessage(const ofJson& json);
 	void mouseMoved(int x, int y);
 	void mousePressed(int x, int y, int button);
 	void keyPressed(int key);
+	void login(string APICall);
 
 	//declare twitter search client
 	ofxTwitter::SearchClient client;
+	//ofxTwitter::
 	ofxTwitter::User user;
 	ofxTwitter::BaseUser baseuser;
 	ofxTwitter::Entities entities;
+	//json
+	ofxJSONElement json;
+	string APIKey;
+	string APICall;
+	bool parseSuccess;
 
 	//GUI
 	ofxPanel sidebar;
@@ -61,11 +69,16 @@ public:
 	states state;
 
 	//stringstreams
-	stringstream login;
+	string searchTerm;
+	string mediaFilename;
+	stringstream loginString;
 	stringstream searchstring;
 
-	int basex = 100;
-	int basey = 100;
+
+	int basex;
+	int basey;
+	int tweety;
+	bool firstLoad;
 
 	//declare variables
 	int xmouse, ymouse;

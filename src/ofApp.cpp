@@ -29,10 +29,12 @@ void ofApp::setup()
 	//TEXT
 	myfont.init("JustAnotherHand-Regular.ttf", 50);
 
-	//GUI
-	btn.set(ofGetWindowWidth() - basex, basey, 150, 100);
-	idCheck.set(ofGetWindowWidth() / 2, (ofGetWindowHeight() / 2) + 100, 500, 100);
-	searchbar.set(basex, basey, 350, 100);
+	//GUI SETUP
+	//login
+	idCheck.set(ofGetWindowWidth() / 2, (ofGetWindowHeight() / 2) + basey, basex*5, basey);
+	//home
+	searchbar.set(basex, basey, basex * 3.5, basey);
+	searchbtn.set(basex * 1.5, basey * 2.5, basex * 2.5, basey / 2);
 
 	// This starts a simple search for an emoticon.
 	client.search(":)");
@@ -48,20 +50,23 @@ void ofApp::setup()
 
 void ofApp::draw()
 {
-	cout << "draw" << endl;
 	if (state == LOGIN) {
+		//BACKGROUND
 		ofBackground(193, 106, 7);
 
+		//LOGIN TEXT
 		myfont.setColor(1, 1, 1, 255);
 		myfont.setHtmlText("Enter User ID");
 		myfont.draw(ofGetWindowWidth() / 2, ofGetWindowHeight() / 2);
 
+		//ENTERBOX
 		ofSetColor(255, 255, 255);
 		ofDrawRectangle(idCheck);
 
+		//USERTEXT
 		ofSetColor(1, 1, 1);
 		myfont.setHtmlText(login.str());
-		myfont.draw((ofGetWindowWidth() / 2) + 20, (ofGetWindowHeight() / 2) + 100);
+		myfont.draw((ofGetWindowWidth() / 2) + (basex*0.2), (ofGetWindowHeight() / 2) + basey);
 
 	}
 	else if (state == HOME) {
@@ -73,15 +78,16 @@ void ofApp::draw()
 		background.draw(0, 0, ofGetScreenWidth(), ofGetScreenHeight());
 
 		//SIDEBAR
-		//
+		//search
 		ofSetColor(255, 255, 255);
-		ofDrawRectangle(btn);
-
-		//searchbar
+		ofDrawRectangle(searchbtn);
+		ofSetColor(1, 1, 1);
+		ofDrawBitmapString("SEARCH", basex * 1.75, basey * 2.75);
+		ofSetColor(255, 255, 255);
 		ofDrawRectangle(searchbar);
 		ofSetColor(1, 1, 1);
 		myfont.setHtmlText(searchstring.str());
-		myfont.draw(basex + 20, basey);
+		myfont.draw(basex * 1.2, basey);
 
 		//TWEETS
 		for (int i = 0; i < tweets.size(); i++) {
@@ -89,13 +95,15 @@ void ofApp::draw()
 			ofImage card;
 			card.load("card.png");
 			ofSetColor(255, 255);
-			card.draw(basex + 450, basey + (i * 350), 1000, 250);
+			card.draw(basex * 5.5, basey + (i * 350), basex * 10, basey * 2.5);
 
 			//TWEET TXT
 			myfont.setColor(1, 1, 1, 255);
 			myfont.setHtmlText("User: " + tweets[i].userName + "\n" + tweets[i].tweetText);
 			myfont.wrapTextX(1000, false);
 			myfont.draw(basex + 460, basey + (10 + (i * 350)));
+
+			//cout << tweets[i].entities.type() << endl;
 		}
 		ofDrawBitmapString(xmouse, xmouse + 15, ymouse - 30);
 		ofDrawBitmapString(ymouse, xmouse + 15, ymouse - 20);
@@ -103,8 +111,10 @@ void ofApp::draw()
 }
 
 //This function is called everytime the a new tweet is recieved
-void ofApp::onStatus(const ofxTwitter::Status& status)
+void ofApp::onStatus(const ofxTwitter::Status& status, ofxTwitter::Entities& ent)
 {
+	ent.mediaEntities()
+	cout << ent.mediaEntities(mediaEntities.id()) << endl;
 	Tweet newTweet(status.user()->name(), status.text(), status.entities(), status.user()->screenName());
 
 	tweets.push_back(newTweet);
@@ -133,10 +143,14 @@ void ofApp::mouseMoved(int x, int y) {
 }
 
 void ofApp::mousePressed(int x, int y, int button) {
-	if (btn.inside(x, y)) {
-		std::cout << "Clicked button 2" << endl;
-		tweets.clear();
-		client.search(searchTerm);
+	if (searchbtn.inside(x, y)) {
+		if (searchstring.str().length() > 0) { //only runs if theres actually a search
+			std::cout << "Clicked button 2" << endl;
+			tweets.clear();
+			cout << searchstring.str() << endl;
+			client.search(searchstring.str());
+			searchstring.str("");
+		}
 	}
 }
 
@@ -159,24 +173,16 @@ void ofApp::keyPressed(int key) {
 	}
 	else if (state == HOME) {
 		if (key == ' ') {
+			/*
 			cout << "debug" << endl;
 			cout << searchstring.str() << endl;
 			tweets.clear();
 			client.search(searchstring.str());
 			searchstring.clear();
+			*/
 		}
 		else {
 			searchstring << char(key);
 		}
 	}
 }
-/*
-void checkKey(int key) {
-
-	char l;
-
-	switch (key) {
-		case
-	}
-}
-*/

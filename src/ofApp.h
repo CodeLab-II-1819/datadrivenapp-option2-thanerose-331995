@@ -33,7 +33,7 @@ public:
 	//declare app functions
 	void setup();
 	void draw();
-	void onStatus(const ofxTwitter::Status& status);
+	void onStatus(const ofxTwitter::Status& status, ofxTwitter::Entities& ent);
 	void onError(const ofxTwitter::Error& error);
 	void onException(const std::exception& exception);
 	void onMessage(const ofJson& json);
@@ -45,11 +45,11 @@ public:
 	ofxTwitter::SearchClient client;
 	ofxTwitter::User user;
 	ofxTwitter::BaseUser baseuser;
-	string searchTerm;
+	ofxTwitter::Entities entities;
 
-	//gui properties
+	//GUI
 	ofxPanel sidebar;
-	ofRectangle btn, idCheck, searchbar;
+	ofRectangle idCheck, searchbar, searchbtn;
 
 	ofxTextBlock myfont;
 	TextBlockAlignment alignment;
@@ -59,6 +59,8 @@ public:
 
 	enum states { LOGIN, HOME };
 	states state;
+
+	//stringstreams
 	stringstream login;
 	stringstream searchstring;
 

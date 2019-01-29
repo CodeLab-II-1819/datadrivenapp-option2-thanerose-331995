@@ -15,12 +15,12 @@ using namespace std;
 //initial app setup
 void ofApp::setup()
 {
+	//setup variables
 	basex = ofGetScreenWidth() / 20;
 	basey = ofGetScreenHeight() / 20;
 	dstate = HOME;
 	sstate = ARCHIVE;
 	int count = 0;
-	firstLoad = true;
 	getTweets = false;
 	tweety = basey - 100;
 
@@ -35,20 +35,23 @@ void ofApp::setup()
 	
 	//POLLING TO GET NEW TWEETS
 	client.setPollingInterval(6000);
-	//client.search("exo cbx"); //example search
-
-	ofxTwitter::SearchQuery query("ihlfsaldfijdsalfjlesakfnesahdfgh");
+	ofxTwitter::SearchQuery query("exocbx");
 	client.search(query);
 
-	//TEXT
-	myfont.init("assets/JustAnotherHand-Regular.ttf", basex/5);
 
 	//GUI SETUP
+	//text
+	myfont.init("assets/JustAnotherHand-Regular.ttf", basex/5);
 	//login
 	idCheck.set(ofGetWindowWidth() / 2, (ofGetWindowHeight() / 2) + basey, basex*5, basey);
 	//home
 	searchbar.set(basex, basey, basex * 2, basey);
-	searchbtn.set(basex * 1.25, basey * 2.5, basex * 1.5, basey / 2);
+	searchbtn.set(basex * 1.25, basey * 2.5, basex * 1.5, basey / 2.2);
+	livebtn.set(basex, basey * 3.5, basex * 0.95, basey / 2);
+	archivebtn.set(basex * 2, basey * 3.5, basex * 0.95, basey / 2);
+	popularbtn.set(basex * 11, basey * 4.8, basex, basey / 2);
+	recentbtn.set(basex * 11, basey * 5.6, basex, basey / 2);
+	mixedbtn.set(basex * 11, basey * 6.4, basex, basey / 2);
 }
 
 void ofApp::draw()
@@ -85,7 +88,6 @@ void ofApp::draw()
 	//search
 	ofSetColor(255, 255, 255);
 	ofDrawRectangle(searchbtn); //button
-
 	ofSetColor(1, 1, 1);
 	ofDrawBitmapString("SEARCH", basex * 1.8, basey * 2.8); //search text
 
@@ -96,15 +98,50 @@ void ofApp::draw()
 	myfont.setHtmlText(searchstring.str()); //search string
 	myfont.draw(basex * 1.2, basey);
 
+	//live/archive buttons
+	//live
+	sstate == LIVE ? ofSetColor(200, 200, 200) : ofSetColor(255, 255, 255);
+	ofDrawRectangle(livebtn);
+	ofSetColor(1, 1, 1);
+	ofDrawBitmapString("Live Tweets", basex * 1.25, basey * 3.8);
+	//archive
+	sstate == ARCHIVE ? ofSetColor(200, 200, 200) : ofSetColor(255, 255, 255);
+	ofDrawRectangle(archivebtn);
+	ofSetColor(1, 1, 1);
+	ofDrawBitmapString("Archive Tweets", basex * 2.15, basey * 3.8);
 
+	//searchby
+	ofDrawRectangle(popularbtn);
+	ofDrawRectangle(recentbtn);
+	ofDrawRectangle(mixedbtn);
+
+	ofImage paper;
+	paper.load("assets/paper.png");
+	ofSetColor(255, 255);
+	paper.draw(basex * 9.5, basey * 3.5, basex*5.5, basey*10);
+
+	myfont.setHtmlText("Search By:");
+	myfont.draw(basex * 11, basey * 3.8);
+	myfont.setHtmlText("> most popular");
+	myfont.draw(basex * 11, basey * 4.45);
+	myfont.setHtmlText("> most recent");
+	myfont.draw(basex * 11, basey * 4.95);
+	myfont.setHtmlText("> mixed");
+	myfont.draw(basex * 11, basey * 5.45);
+
+	
 	int thistweety = tweety;
 
 	//changing array to draw array
-	sstate == LIVE ? drawTweets(liveTweets) : drawTweets(archiveTweets);
+	if (sstate == LIVE) {
+		drawTweets(liveTweets);
+	}
+	else if(sstate == ARCHIVE) {
+		drawTweets(archiveTweets);
+	}
 
 	//DRAWTWEETS
 	for (int i = 0; i < searchResults.size(); i++) {
-		cout << searchResults[i].day << endl;
 		if (searchResults[i].tweetText.size() == 0) {
 			cout << "empty tweet" << endl;
 		}
@@ -152,6 +189,8 @@ void ofApp::draw()
 				rply.load("assets/reply.png");
 				rply.draw(cardx*1.35, cardy + 200, basex / 5, basex / 5);
 				ofDrawBitmapString(rts, cardx * 1.425, cardy + 220);
+				//date
+				ofDrawBitmapString(searchResults[i].date, cardx * 1.5, cardy + 220);
 
 				thistweety += basey * 3;
 			}
@@ -180,7 +219,7 @@ void ofApp::draw()
 				myfont.draw(polaroidx * 1.05, polaroidy + 860);
 				//tweet
 				myfont.setHtmlText(searchResults[i].tweetText);
-				myfont.wrapTextX(polaroidx * 0.5, false);
+				myfont.wrapTextX(polaroidw * 0.9, false);
 				myfont.draw(polaroidx * 1.05, polaroidy + 910);
 
 				//TWT INFO
@@ -190,18 +229,20 @@ void ofApp::draw()
 				//likes
 				ofImage like;
 				like.load("assets/like.png");
-				like.draw(polaroidx*1.05, polaroidy + 200, basex / 5, basex / 5);
-				ofDrawBitmapString(likes, polaroidx * 1.125, polaroidy + 1070);
+				like.draw(polaroidx * 1.05, polaroidy + 10530, basex / 5, basex / 5);
+				ofDrawBitmapString(likes, polaroidx * 1.125, polaroidy + 1050);
 				//retweets
 				ofImage rt;
 				rt.load("assets/rt.png");
-				rt.draw(polaroidx*1.2, polaroidy + 200, basex / 5, basex / 5);
-				ofDrawBitmapString(rts, polaroidx * 1.275, polaroidy + 1070);
+				rt.draw(polaroidx * 1.2, polaroidy + 1030, basex / 5, basex / 5);
+				ofDrawBitmapString(rts, polaroidx * 1.275, polaroidy + 1050);
 				//replies
 				ofImage rply;
 				rply.load("assets/reply.png");
-				rply.draw(polaroidx*1.35, polaroidy + 200, basex / 5, basex / 5);
-				ofDrawBitmapString(rts, polaroidx * 1.425, polaroidy + 220);
+				rply.draw(polaroidx * 1.35, polaroidy + 1030, basex / 5, basex / 5);
+				ofDrawBitmapString(rts, polaroidx * 1.425, polaroidy + 1050);
+				//date
+				ofDrawBitmapString(searchResults[i].date, polaroidx * 1.55, polaroidy + 1050);
 
 				thistweety += basey * 11.5;
 			}
@@ -221,8 +262,6 @@ void ofApp::update(){
 //This function is called everytime the a new tweet is recieved
 void ofApp::onStatus(const ofxTwitter::Status& status)
 {
-	cout << archiveTweets.size() << endl;
-
 	if (getTweets) { //if we are still getting tweets
 		if (status.text()[0] == 'R' && status.text()[1] == 'T') { //and its not a retweet
 
@@ -299,7 +338,9 @@ void ofApp::mouseMoved(int x, int y) {
 
 void ofApp::mousePressed(int x, int y, int button) {
 
+	//press search
 	if (searchbtn.inside(x, y)) {
+		lastSearch = searchstring.str();
 		if (searchstring.str().length() > 0) { //only runs if theres actually a search
 			//debug
 			cout << "Clicked button 2" << endl;
@@ -308,21 +349,41 @@ void ofApp::mousePressed(int x, int y, int button) {
 			archiveTweets.clear();
 			count = 0;
 			tweety = basey - 100;
+			cout << "search: " + searchstring.str() << endl;
 
 			//if search is a live search
 			if (sstate == LIVE) {
-
-				cout << "search: " + searchstring.str() << endl;
 				liveTweets.clear();
 				client.search(searchstring.str());
-				searchstring.str("");
 			}
 			//else if archive
 			else if (sstate == ARCHIVE) {
-				cout << "search: " + searchstring.str() << endl;
+				archiveTweets.clear();
 				ofxTwitter::SearchQuery query(searchstring.str());
 				client.search(query);
 			}
+			searchResults.clear();
+			searchstring.str("");
+		}
+	}
+
+	//press archive
+	if (archivebtn.inside(x, y)) {
+		if (sstate != ARCHIVE) {
+			sstate = ARCHIVE;
+			archiveTweets.clear();
+			ofxTwitter::SearchQuery query(lastSearch);
+			client.search(query);
+			searchResults.clear();
+		}
+	}
+	//press live
+	if (livebtn.inside(x, y)) {
+		if (sstate != LIVE) {
+			sstate = LIVE;
+			liveTweets.clear();
+			client.search(lastSearch);
+			searchResults.clear();
 		}
 	}
 }
@@ -360,7 +421,7 @@ Tweet::Tweet(string userName, string tweetText, string screenName, string mediaI
 		this->likes = likes;
 	}
 	//datetime
-	this->date = to_string(datetime.day()) + "/" + to_string(datetime.month()) + "/" + to_string(datetime.year());
+	this->date = to_string(datetime.day()) + "/" + to_string(datetime.month()) + "/" + to_string(datetime.year()) + "   " + to_string(datetime.hour()) + ":" +to_string(datetime.minute());
 
 
 }
@@ -372,21 +433,10 @@ void ofApp::keyPressed(int key) {
 			loginString << char(key);
 		}
 		else {
-			//APICall = ("https://api.twitter.com/1.1/statuses/user_timeline.json?" + loginString.str() + "=twitterapi&count=2");
-			//login(APICall);
 		}
 	}
 	else if (dstate == HOME) {
-		if (GetKeyState(VK_SPACE)) {
-			if (sstate == LIVE) {
-				sstate = ARCHIVE;
-				cout << sstate << endl;
-			}
-			else {
-				sstate = LIVE;
-				cout << sstate << endl;
-			}
-		}
+
 		/*
 		if (GetKeyState(VK_DOWN)) {
 			tweety -= 50;

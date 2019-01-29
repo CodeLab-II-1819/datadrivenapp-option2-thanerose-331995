@@ -48,28 +48,20 @@ public:
 	void mouseMoved(int x, int y);
 	void mousePressed(int x, int y, int button);
 	void keyPressed(int key);
-	void login(string APICall);
 
 	//declare twitter search client
 	ofxTwitter::SearchClient client;
-	ofxTwitter::FilterQuery filterQuery;
 	ofxTwitter::Entities entities;
-	//json
-	ofxJSONElement json;
-	string APIKey;
-	string APICall;
-	bool parseSuccess;
 
 	//GUI
 	ofxPanel sidebar;
-	ofRectangle idCheck, searchbar, searchbtn;
+	ofRectangle idCheck, searchbar, searchbtn, livebtn, archivebtn, popularbtn, recentbtn, mixedbtn;
 
 	ofxTextBlock myfont;
 	TextBlockAlignment alignment;
 
 	//vector
 	vector<Tweet> liveTweets, archiveTweets, searchResults;
-	bool getTweets;
 
 	enum drawStates { LOGIN, HOME };
 	enum searchStates { LIVE, ARCHIVE };
@@ -77,15 +69,11 @@ public:
 	searchStates sstate;
 
 	//stringstreams
-	string searchTerm;
-	string mediaFilename;
-	stringstream loginString;
-	stringstream searchstring;
+	string lastSearch, mediaFilename;
+	stringstream loginString,searchstring;
 
-	int basex;
-	int basey;
-	int tweety;
-	bool firstLoad;
+	int basex, basey, tweety;
+	bool getTweets;
 
 	//declare variables
 	int xmouse, ymouse;

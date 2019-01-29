@@ -16,6 +16,7 @@
 #include "ofxJSON.h"
 #include <vector>
 #include <string>
+#include <Poco/DateTime.h>
 
 class Tweet {
 public:
@@ -23,8 +24,12 @@ public:
 	string tweetText;
 	string screenName;
 	string mediaID;
+	int replies;
+	int retweets;
+	int likes;
+	string date;
 
-	Tweet(string userName, string tweetText, string screenName, string mediaID);
+	Tweet(string userName, string tweetText, string screenName, string mediaID, int replies, int retweets, int likes, Poco::DateTime &datetime);
 };
 
 class ofApp : public ofBaseApp
@@ -34,6 +39,8 @@ public:
 	//declare app functions
 	void setup();
 	void draw();
+	void update();
+	void drawTweets(vector<Tweet> temp);
 	void onStatus(const ofxTwitter::Status& status);
 	void onError(const ofxTwitter::Error& error);
 	void onException(const std::exception& exception);
@@ -45,9 +52,7 @@ public:
 
 	//declare twitter search client
 	ofxTwitter::SearchClient client;
-	//ofxTwitter::
-	ofxTwitter::User user;
-	ofxTwitter::BaseUser baseuser;
+	ofxTwitter::FilterQuery filterQuery;
 	ofxTwitter::Entities entities;
 	//json
 	ofxJSONElement json;
@@ -63,17 +68,19 @@ public:
 	TextBlockAlignment alignment;
 
 	//vector
-	vector<Tweet> tweets;
+	vector<Tweet> liveTweets, archiveTweets, searchResults;
+	bool getTweets;
 
-	enum states { LOGIN, HOME };
-	states state;
+	enum drawStates { LOGIN, HOME };
+	enum searchStates { LIVE, ARCHIVE };
+	drawStates dstate;
+	searchStates sstate;
 
 	//stringstreams
 	string searchTerm;
 	string mediaFilename;
 	stringstream loginString;
 	stringstream searchstring;
-
 
 	int basex;
 	int basey;

@@ -48,6 +48,7 @@ public:
 	void mouseMoved(int x, int y);
 	void mousePressed(int x, int y, int button);
 	void keyPressed(int key);
+	void search(string thisSearch);
 
 	//declare twitter search client
 	ofxTwitter::SearchClient client;
@@ -55,7 +56,8 @@ public:
 
 	//GUI
 	ofxPanel sidebar;
-	ofRectangle idCheck, searchbar, searchbtn, livebtn, archivebtn, popularbtn, recentbtn, mixedbtn;
+	ofRectangle idCheck, searchbar, searchbtn, livebtn, archivebtn, popularbtn, recentbtn, mixedbtn, aticon, hashtagsearch;
+	ofImage paper, background, card, like, rt, rply, polaroid, photo, note;
 
 	ofxTextBlock myfont;
 	TextBlockAlignment alignment;
@@ -70,10 +72,10 @@ public:
 
 	//stringstreams
 	string lastSearch, mediaFilename;
-	stringstream loginString,searchstring;
+	stringstream loginString, searchstring, hashtagsearchstr;
 
 	int basex, basey, tweety;
-	bool getTweets;
+	bool getTweets, ispopular, ismixed, isrecent, process, hashtagclicked;
 
 	//declare variables
 	int xmouse, ymouse;

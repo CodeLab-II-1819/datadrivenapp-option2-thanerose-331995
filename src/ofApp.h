@@ -39,7 +39,6 @@ public:
 	//declare app functions
 	void setup();
 	void draw();
-	void update();
 	void drawTweets(vector<Tweet> temp);
 	void onStatus(const ofxTwitter::Status& status);
 	void onError(const ofxTwitter::Error& error);
@@ -61,7 +60,6 @@ public:
 	ofImage paper, background, card, like, rt, rply, polaroid, photo, note, add, map, exiticon, coffee, pens, office;
 
 	ofxTextBlock myfont;
-	TextBlockAlignment alignment;
 
 	//vectors
 	vector<Tweet> liveTweets, archiveTweets, searchResults;
@@ -74,11 +72,7 @@ public:
 	string lastSearch, mediaFilename;
 	stringstream searchstring, hashtagsearchstr, allhashtags, shiftstring;
 
-	int basex, basey, tweety, location;
-	bool getTweets, ispopular, ismixed, isrecent, process, hashtagclicked, checklocation, mediaonly;
+	int basex, basey, tweety, location, xmouse, ymouse, count;
+	bool ispopular, ismixed, isrecent, process, hashtagclicked, checklocation, mediaonly;
 
-	//declare variables
-	int xmouse, ymouse;
-	int count = 0;
-	int countMissed = 0;
 };

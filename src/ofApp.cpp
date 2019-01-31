@@ -23,8 +23,9 @@ void ofApp::setup()
 	int count = 0;
 	tweety = basey - 100;
 	//set bools
-	getTweets = true;
 	ispopular = false;
+	isrecent = false;
+	ismixed = false;
 	process = true;
 	hashtagclicked = false;
 	mediaonly = false;
@@ -89,9 +90,8 @@ void ofApp::draw()
 	coffee.draw(basex * 8.2, 0 - (basex * 1.5), basex * 3.5, basex * 3.5);
 	office.load("assets/officeitems.png");
 	office.draw(basex - (basex * 3.8), basey * 8.7, basex * 6.7, basex * 6.5);
-
 	//SIDEBAR
-	//meida
+	//media
 	ofSetColor(255, 255, 255);
 	ofDrawRectangle(mediacheck); //button
 	ofSetColor(1, 1, 1, 255);
@@ -133,7 +133,8 @@ void ofApp::draw()
 
 	paper.load("assets/paper.png");
 	ofSetColor(255, 255);
-	paper.draw(basex * 9.5, basey * 3.5, basex*5.5, basey*10);
+	paper.draw(basex * 9.5, basey * 3.5, basex*5.5, basey * 10);
+
 
 	myfont.setHtmlText("Search By:");
 	myfont.draw(basex * 11, basey * 3.8);
@@ -186,7 +187,7 @@ void ofApp::draw()
 	}
 	//previous hashtags
 	for (int u = 0; u < hashtags.size(); u++) {
-		ofDrawBitmapString(hashtags[u], basex * 1.4, (basey * 6.7) + (u * 10));
+		ofDrawBitmapString(hashtags[u], basex * 1.4, (basey * 6.3) + (u * 20));
 	}
 	ofSetColor(255, 255, 255);
 	ofDrawRectangle(clearhash);
@@ -209,7 +210,6 @@ void ofApp::draw()
 	for (int i = 0; i < searchResults.size(); i++) {
 
 		if (searchResults[i].tweetText.size() == 0) {
-			cout << "empty tweet" << endl;
 		}
 		else { //draw tweets
 			if (searchResults[i].mediaID == "0") { //text only tweets
@@ -315,54 +315,33 @@ void ofApp::draw()
 	
 }
 
-void ofApp::update(){
-	
-}
-
 //This function is called everytime the a new tweet is recieved
 void ofApp::onStatus(const ofxTwitter::Status& status)
 {
-	if (getTweets) { //if we are still getting tweets
-		process = true;
-		if (status.text()[0] == 'R' && status.text()[1] == 'T') { //and its not a retweet
+	process = true;
+	if (status.text()[0] == 'R' && status.text()[1] == 'T') { //and its not a retweet
 			process = false;
 		}
-		if (status.language() != "en") { //only if language is english
+	if (status.language() != "en") { //only if language is english
 			process = false;
 		}
 		
-		if (process) {
-			cout << "count of tweets: " + to_string(count) << endl;
-			count++;
+	if (process) {
+		cout << "count of tweets: " + to_string(count) << endl;
+		count++;
 
-			if (status.extendedEntities().mediaEntities().size()) { //check there is a media attached
+		if (status.extendedEntities().mediaEntities().size()) { //check there is a media attached
 
-				for (auto e : status.extendedEntities().mediaEntities()) //check for media type
+			for (auto e : status.extendedEntities().mediaEntities()) //check for media type
+			{
+				if (e.type() == ofxTwitter::MediaEntity::Type::PHOTO || e.type() == ofxTwitter::MediaEntity::Type::ANIMATED_GIF) //if media is photo
 				{
-					if (e.type() == ofxTwitter::MediaEntity::Type::PHOTO || e.type() == ofxTwitter::MediaEntity::Type::ANIMATED_GIF) //if media is photo
-					{
-						string filename = e.mediaFilename();
-						mediaFilename = filename; //so the push_back can call out of the for
-						ofSaveURLAsync(e.mediaURL(), filename); //save the file
-						ofLogNotice("ofApp::onStatus") << "Downloading" << filename;
+					string filename = e.mediaFilename();
+					mediaFilename = filename; //so the push_back can call out of the for
+					ofSaveURLAsync(e.mediaURL(), filename); //save the file
+					ofLogNotice("ofApp::onStatus") << "Downloading" << filename;
 
-						Tweet newTweet(status.user()->name(), status.text(), status.user()->screenName(), mediaFilename, status.replyCount(), status.retweetCount(), status.favoriteCount(), status.createdAt()); //construct tweet
-						if (sstate == LIVE) {
-							liveTweets.push_back(newTweet);
-						}
-						else if (sstate == ARCHIVE) {
-							archiveTweets.push_back(newTweet);
-						}
-					}
-					else {
-						cout << "media cant download, url: " + status.url() << endl; //cout url so i can check empty tweet
-					}
-				}
-			}
-			else { //no media attached
-				if (!mediaonly) {
-					Tweet newTweet(status.user()->name(), status.text(), status.user()->screenName(), "0", status.replyCount(), status.retweetCount(), status.favoriteCount(), status.createdAt()); //construct tweet
-
+					Tweet newTweet(status.user()->name(), status.text(), status.user()->screenName(), mediaFilename, status.replyCount(), status.retweetCount(), status.favoriteCount(), status.createdAt()); //construct tweet
 					if (sstate == LIVE) {
 						liveTweets.push_back(newTweet);
 					}
@@ -370,146 +349,25 @@ void ofApp::onStatus(const ofxTwitter::Status& status)
 						archiveTweets.push_back(newTweet);
 					}
 				}
+				else {
+					cout << "media cant download, url: " + status.url() << endl; //cout url so i can check empty tweet
+				}
 			}
-			if (status.place() != 0) {
-				cout << "locatation of tweet: " + status.place()->name() << endl;
+		}
+		else { //no media attached
+			if (!mediaonly) {
+				Tweet newTweet(status.user()->name(), status.text(), status.user()->screenName(), "0", status.replyCount(), status.retweetCount(), status.favoriteCount(), status.createdAt()); //construct tweet
+
+				if (sstate == LIVE) {
+					liveTweets.push_back(newTweet);
+				}
+				else if (sstate == ARCHIVE) {
+					archiveTweets.push_back(newTweet);
+				}
 			}
 		}
-	}	
-}
-
-//returns an error message if error encountered recieving tweets
-void ofApp::onError(const ofxTwitter::Error& error)
-{
-	std::cout << "Error: " << error.code() << " " << error.message();
-}
-
-//returns an exception message if exception encountered recieving tweets
-void ofApp::onException(const std::exception& notice)
-{
-	std::cout << "Exception: " << notice.what();
-}
-
-void ofApp::onMessage(const ofJson& json)
-{
-	// This is the raw message json and is ignored here.
-}
-
-void ofApp::mouseMoved(int x, int y) {
-	xmouse = x;
-	ymouse = y;
-}
-
-void ofApp::mousePressed(int x, int y, int button) {
-
-	//exit
-	if (exit.inside(x, y)) {
-		savefiledata();
-		ofExit();
-	}
-
-	//press search
-	if (searchbtn.inside(x, y)) {
-		lastSearch = searchstring.str();
-		if (searchstring.str().length() > 0) { //only runs if theres actually a search
-			search(searchstring.str());
-			searchstring.str("");
-		}
-	}
-	
-	//SEARCH BY
-	//media
-	if (mediacheck.inside(x,y)) {
-		if (mediaonly) {
-			mediaonly = false;
-		}
-		else {
-			mediaonly = true;
-		}
-		search(lastSearch);
-	}
-	//popular
-	if (popularbtn.inside(x, y)) {
-		ispopular = true;
-		isrecent = false;
-		ismixed = false;
-		search(lastSearch);
-	}
-	//recent
-	if (recentbtn.inside(x, y)) {
-		cout << "recent clicked" << endl;
-		ispopular = false;
-		isrecent = true;
-		ismixed = false;
-		search(lastSearch);
-	}
-	//mixed
-	if (mixedbtn.inside(x, y)) {
-		cout << "popular clicked" << endl;
-		ispopular = false;
-		isrecent = false;
-		ismixed = true;
-		search(lastSearch);
-	}
-
-	//HASHTAGS
-	//press hashtag
-	if (hashtagsearch.inside(x, y)) {
-		hashtagclicked = true;
-	}
-	else {
-		hashtagsearchstr.str("");
-		hashtagclicked = false;
-	}
-	//press add
-	if (addhashtag.inside(x, y)) {
-		if (hashtagclicked) {
-			hashtags.push_back(hashtagsearchstr.str());
-			allhashtags << " #" + hashtagsearchstr.str();
-			hashtagsearchstr.str("");
-			search(allhashtags.str());
-		}
-	}
-	//clear hashtag
-	if (clearhash.inside(x, y)) {
-		hashtagsearchstr.str("");
-	}
-
-	//LOCATIONS
-	if (location1.inside(x, y)) {
-		location = 1;
-		checklocation = true;
-		search(lastSearch);
-	}
-	if (location2.inside(x, y)) {
-		location = 2;
-		checklocation = true;
-		search(lastSearch);
-	}
-	if (location3.inside(x, y)) {
-		location = 3;
-		checklocation = true;
-		search(lastSearch);
-	}
-	if (location4.inside(x, y)) {
-		location = 4;
-		checklocation = true;
-		search(lastSearch);
-	}
-
-	//TWEET TYPE
-	//press archive
-	if (archivebtn.inside(x, y)) {
-		if (sstate != ARCHIVE) {
-			sstate = ARCHIVE;
-			search(lastSearch);
-		}
-	}
-	//press live
-	if (livebtn.inside(x, y)) {
-		if (sstate != LIVE) {
-			sstate = LIVE;
-			search(lastSearch);
+		if (status.place() != 0) {
+			cout << "locatation of tweet: " + status.place()->name() << endl;
 		}
 	}
 }
@@ -547,9 +405,166 @@ Tweet::Tweet(string userName, string tweetText, string screenName, string mediaI
 		this->likes = likes;
 	}
 	//datetime
-	this->date = to_string(datetime.day()) + "/" + to_string(datetime.month()) + "/" + to_string(datetime.year()) + "   " + to_string(datetime.hour()) + ":" +to_string(datetime.minute());
+	this->date = to_string(datetime.day()) + "/" + to_string(datetime.month()) + "/" + to_string(datetime.year()) + "   " + to_string(datetime.hour()) + ":" + to_string(datetime.minute());
 
 
+}
+
+//returns an error message if error encountered recieving tweets
+void ofApp::onError(const ofxTwitter::Error& error)
+{
+	std::cout << "Error: " << error.code() << " " << error.message();
+}
+
+//returns an exception message if exception encountered recieving tweets
+void ofApp::onException(const std::exception& notice)
+{
+	std::cout << "Exception: " << notice.what();
+}
+
+void ofApp::onMessage(const ofJson& json)
+{
+	// This is the raw message json and is ignored here.
+}
+
+void ofApp::mouseMoved(int x, int y) {
+	xmouse = x;
+	ymouse = y;
+}
+
+void ofApp::mousePressed(int x, int y, int button) {
+
+	//exit
+	if (exit.inside(x, y)) {
+		savefiledata();
+		ofExit();
+	}
+
+	//press search
+	if (searchbtn.inside(x, y)) {
+		if (searchstring.str().length() > 0) { //only runs if theres actually a search
+			lastSearch = searchstring.str();
+			search(searchstring.str());
+			searchstring.str("");
+		}
+	}
+	
+	//SEARCH BY
+	//media
+	if (mediacheck.inside(x,y)) {
+		if (mediaonly) {
+			mediaonly = false;
+		}
+		else {
+			mediaonly = true;
+		}
+		search(lastSearch);
+	}
+	//popular
+	if (popularbtn.inside(x, y)) {
+		if (ispopular) {
+			ispopular = false;
+		}
+		else {
+			ispopular = true;
+		}
+		isrecent = false;
+		ismixed = false;
+		search(lastSearch);
+	}
+	//recent
+	if (recentbtn.inside(x, y)) {
+		if (isrecent) {
+			isrecent = false;
+		}
+		else {
+			isrecent = true;
+		}
+		cout << "recent clicked" << endl;
+		ispopular = false;
+		ismixed = false;
+		search(lastSearch);
+	}
+	//mixed
+	if (mixedbtn.inside(x, y)) {
+		if (ismixed) {
+			ismixed = false;
+		}
+		else {
+			ismixed = true;
+		}
+		cout << "mixed clicked" << endl;
+		ispopular = false;
+		isrecent = false;
+		search(lastSearch);
+	}
+
+	//HASHTAGS
+	//press hashtag
+	if (hashtagsearch.inside(x, y)) {
+		hashtagclicked = true;
+	}
+	else {
+		hashtagsearchstr.str("");
+		hashtagclicked = false;
+	}
+	//press add
+	if (addhashtag.inside(x, y)) {
+		if (hashtagclicked) {
+			hashtags.push_back(hashtagsearchstr.str());
+			allhashtags << " #" + hashtagsearchstr.str();
+			hashtagsearchstr.str("");
+			search(allhashtags.str());
+		}
+	}
+	//clear hashtag
+	if (clearhash.inside(x, y)) {
+		hashtagsearchstr.str("");
+		hashtags.clear();
+	}
+
+	//LOCATIONS
+	if (location1.inside(x, y)) {
+		location = 1;
+		checklocation = true;
+		search(lastSearch);
+	}
+	if (location2.inside(x, y)) {
+		location = 2;
+		checklocation = true;
+		search(lastSearch);
+	}
+	if (location3.inside(x, y)) {
+		location = 3;
+		checklocation = true;
+		search(lastSearch);
+	}
+	if (location4.inside(x, y)) {
+		location = 4;
+		checklocation = true;
+		search(lastSearch);
+	}
+
+	//TWEET TYPE
+	//press archive
+	if (archivebtn.inside(x, y)) {
+		if (sstate != ARCHIVE) {
+			sstate = ARCHIVE;
+			search(lastSearch);
+		}
+	}
+	//press live
+	if (livebtn.inside(x, y)) {
+		if (sstate != LIVE) {
+			checklocation = false;
+			ispopular = false;
+			isrecent = false;
+			ismixed = false;
+			mediaonly = false;
+			sstate = LIVE;
+			search(lastSearch);
+		}
+	}
 }
 
 void ofApp::keyPressed(int key) {
@@ -565,7 +580,6 @@ void ofApp::keyPressed(int key) {
 	else {
 		if (hashtagclicked) {
 			hashtagsearchstr << char(key);
-			cout << (key);
 		}
 		else {
 			if (GetKeyState(VK_SHIFT) == 1 || GetKeyState(VK_SHIFT) == 0) {
@@ -645,12 +659,12 @@ void ofApp::search(string thisSearch) {
 }
 
 void ofApp::getfiledata() {
-	ifstream inFile;
-	inFile.open("savefile.txt");
-	if (inFile.good()) { // check file has opened
-		getline(inFile, lastSearch);
+	ifstream infile;
+	infile.open("savefile.txt");
+	if (infile.good()) { // check file has opened
+		getline(infile, lastSearch);
 		cout << "retrieved: " + lastSearch << endl;
-		inFile.close(); // close file
+		infile.close(); // close file
 	}
 }
 

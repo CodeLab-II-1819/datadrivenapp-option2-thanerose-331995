@@ -49,14 +49,16 @@ public:
 	void mousePressed(int x, int y, int button);
 	void keyPressed(int key);
 	void search(string thisSearch);
+	void getfiledata();
+	void savefiledata();
 
 	//declare twitter search client
 	ofxTwitter::SearchClient client;
 	ofxTwitter::Entities entities;
 
 	//GUI
-	ofRectangle idCheck, searchbar, searchbtn, livebtn, archivebtn, popularbtn, recentbtn, mixedbtn, aticon, hashtagsearch, addhashtag, clearhash, location1, location2, location3, location4, mediacheck, exit;
-	ofImage paper, background, card, like, rt, rply, polaroid, photo, note, add, map, exiticon, coffee;
+	ofRectangle searchbar, searchbtn, livebtn, archivebtn, popularbtn, recentbtn, mixedbtn, hashtagsearch, addhashtag, clearhash, location1, location2, location3, location4, mediacheck, exit;
+	ofImage paper, background, card, like, rt, rply, polaroid, photo, note, add, map, exiticon, coffee, pens, office;
 
 	ofxTextBlock myfont;
 	TextBlockAlignment alignment;

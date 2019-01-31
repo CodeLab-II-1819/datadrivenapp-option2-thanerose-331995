@@ -10,6 +10,7 @@
 #include "ofxTextSuite.h"
 #include <string>
 #include <Poco/DateTime.h>
+#include <fstream>
 using namespace std;
 
 //initial app setup
@@ -39,9 +40,9 @@ void ofApp::setup()
 	
 	//POLLING TO GET NEW TWEETS
 	client.setPollingInterval(6000);
-	ofxTwitter::SearchQuery query("exo");
+	getfiledata();
+	ofxTwitter::SearchQuery query(lastSearch);
 	client.search(query);
-	lastSearch = "exo";
 	
 	//GUI SETUP
 	//text
@@ -85,9 +86,10 @@ void ofApp::draw()
 	
 	ofSetColor(255, 255);
 	exiticon.draw(exit);
-
 	coffee.load("assets/coffee.png");
 	coffee.draw(basex * 8.2, 0 - (basex * 1.5), basex * 3.5, basex * 3.5);
+	office.load("assets/officeitems.png");
+	office.draw(basex - (basex * 3.8), basey * 8.7, basex * 6.7, basex * 6.5);
 
 	//SIDEBAR
 	//meida
@@ -403,6 +405,7 @@ void ofApp::mousePressed(int x, int y, int button) {
 
 	//exit
 	if (exit.inside(x, y)) {
+		savefiledata();
 		ofExit();
 	}
 
@@ -585,6 +588,7 @@ void ofApp::drawTweets(vector<Tweet> temp) {
 }
 
 void ofApp::search(string thisSearch) {
+
 	lastSearch = thisSearch;
 	cout << "search: " + thisSearch << endl;
 	//CLEAR EVERYTHING
@@ -639,4 +643,24 @@ void ofApp::search(string thisSearch) {
 		client.search(query);
 	}
 	searchstring.str(""); //clearstring
+}
+
+void ofApp::getfiledata() {
+	ifstream inFile;
+	inFile.open("savefile.txt");
+	if (inFile.good()) { // check file has opened
+		getline(inFile, lastSearch);
+		cout << "retrieved: " + lastSearch << endl;
+		inFile.close(); // close file
+	}
+}
+
+void ofApp::savefiledata() {
+	ofstream outfile;
+	outfile.open("savefile.txt");
+	if (outfile.good()) { //check file is open
+		cout << "saving: " + lastSearch << endl;
+		outfile << lastSearch << endl;
+		outfile.close(); // close file
+	}
 }

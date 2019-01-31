@@ -47,8 +47,6 @@ void ofApp::setup()
 	//GUI SETUP
 	//text
 	myfont.init("assets/JustAnotherHand-Regular.ttf", basex/5);
-	//login
-	idCheck.set(ofGetWindowWidth() / 2, (ofGetWindowHeight() / 2) + basey, basex*5, basey);
 	//home
 	//so many fuckin buttons!!!
 	exit.set(ofGetWindowWidth() - (basex / 2), 0, basex / 2, basex / 2);
@@ -60,9 +58,9 @@ void ofApp::setup()
 	livebtn.set(basex, basey * 3.5, basex * 0.95, basey / 2);
 	archivebtn.set(basex * 2, basey * 3.5, basex * 0.95, basey / 2);
 	//rightsidebar
-	popularbtn.set(basex * 11, basey * 4.8, basex, basey / 2);
-	recentbtn.set(basex * 11, basey * 5.6, basex, basey / 2);
-	mixedbtn.set(basex * 11, basey * 6.4, basex, basey / 2);
+	popularbtn.set(basex * 11, basey * 4.45, basex, basey / 2);
+	recentbtn.set(basex * 11, basey * 4.95, basex, basey / 2);
+	mixedbtn.set(basex * 11, basey * 5.45, basex, basey / 2);
 	location1.set(basex * 11, basey * 8, basex, basey / 2);
 	location2.set(basex * 11, basey * 8.5, basex, basey / 2);
 	location3.set(basex * 11, basey * 9, basex, basey / 2);
@@ -83,6 +81,7 @@ void ofApp::draw()
 	background.load("assets/wood-background.jpg");
 	ofSetColor(255, 255);
 	background.draw(0, 0, ofGetScreenWidth(), ofGetScreenHeight());
+	background.draw(0, 1800, ofGetScreenWidth(), ofGetScreenHeight());
 	
 	ofSetColor(255, 255);
 	exiticon.draw(exit);
@@ -95,7 +94,7 @@ void ofApp::draw()
 	//meida
 	ofSetColor(255, 255, 255);
 	ofDrawRectangle(mediacheck); //button
-	ofSetColor(1, 1, 1);
+	ofSetColor(1, 1, 1, 255);
 	mediaonly == true ? ofDrawBitmapString("Media Only (ACTIVE)", ofGetWindowWidth() - (basex * 2.62), basey * 2.95) : ofDrawBitmapString("Media Only (INACTIVE)", ofGetWindowWidth() - (basex * 2.62), basey * 2.95);
 
 	//search
@@ -317,7 +316,7 @@ void ofApp::draw()
 }
 
 void ofApp::update(){
-	//count < 10 ? getTweets = true : getTweets = false;
+	
 }
 
 //This function is called everytime the a new tweet is recieved

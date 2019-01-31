@@ -55,27 +55,25 @@ public:
 	ofxTwitter::Entities entities;
 
 	//GUI
-	ofxPanel sidebar;
-	ofRectangle idCheck, searchbar, searchbtn, livebtn, archivebtn, popularbtn, recentbtn, mixedbtn, aticon, hashtagsearch;
-	ofImage paper, background, card, like, rt, rply, polaroid, photo, note;
+	ofRectangle idCheck, searchbar, searchbtn, livebtn, archivebtn, popularbtn, recentbtn, mixedbtn, aticon, hashtagsearch, addhashtag, clearhash, location1, location2, location3, location4, mediacheck, exit;
+	ofImage paper, background, card, like, rt, rply, polaroid, photo, note, add, map, exiticon, coffee;
 
 	ofxTextBlock myfont;
 	TextBlockAlignment alignment;
 
-	//vector
+	//vectors
 	vector<Tweet> liveTweets, archiveTweets, searchResults;
-
-	enum drawStates { LOGIN, HOME };
+	vector<string> hashtags;
+	
 	enum searchStates { LIVE, ARCHIVE };
-	drawStates dstate;
 	searchStates sstate;
 
 	//stringstreams
 	string lastSearch, mediaFilename;
-	stringstream loginString, searchstring, hashtagsearchstr;
+	stringstream searchstring, hashtagsearchstr, allhashtags, shiftstring;
 
-	int basex, basey, tweety;
-	bool getTweets, ispopular, ismixed, isrecent, process, hashtagclicked;
+	int basex, basey, tweety, location;
+	bool getTweets, ispopular, ismixed, isrecent, process, hashtagclicked, checklocation, mediaonly;
 
 	//declare variables
 	int xmouse, ymouse;
